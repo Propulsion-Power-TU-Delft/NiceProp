@@ -1,0 +1,2 @@
+# NiceProp
+Interactively learning NICFD
