@@ -1,0 +1,45 @@
+***************************** BASIC SETTINGS *****************************
+Working fluid
+CO2
+EoS used to compute the thermodynamic properties: 'PR', 'SRK', 'HEOS' or 'REFPROP'
+REFPROP
+Thermodynamic plane: 'Ts' or 'PT'
+PT
+
+***************************** ISENTROPIC TRANSFORMATION *****************************
+Thermodynamic process(es): 'compression' or 'expansion' or 'None'
+compression
+Do you want to design nozzle/diffuser for expansion/compression process? Y/N
+Y
+Total-to-total volumetric flow ratio (it must be 0 if using pressure ratio)
+0.0
+Total-to-total pressure ratio (it must be 0 if using volumetric flow ratio)
+4.0
+Inlet state definition: 'Ts' or 'PT' (independent from the choice of Thermodynamic plane)
+Ts     Ts
+Inlet state definition: first input
+1.01   1.05
+Inlet state definition: second input
+1.7    1.1
+Label(s) associated to the thermodynamic process(es)
+iCO$_2$   niCO$_2$
+Nozzle geometry is provided as input? Y/N (file nozzleCoordinates.txt should be located in the input folder)
+N
+
+***************************** COMPONENT DESIGN *****************************
+Mass flow rate [kg/s]
+1.0  1.0
+Flow velocity [m/s] --> at inlet for nozzle, at outlet for diffuser
+20.0  30.0
+Geometry: 'rectangular' or 'circular' for nozzle, 'conical' or 'radial' for diffuser
+radial
+
+***************************** CONTOUR PLOT SETTINGS *****************************
+Number of grid points on x and y axes for Ts/PT contour plots
+1000
+Boundaries of contour plots along reduced T axis
+0.6   2.0
+Boundaries of contour plots along reduced s axis (only used if Thermodynamic plane = 'Ts')
+0.75   2.0
+Boundaries of contour plots along reduced P axis (only used if Thermodynamic plane = 'PT')
+0.5   5.5
