@@ -1,4 +1,5 @@
-# NiceProp
+# NiceProp ![logo](https://github.com/Propulsion-Power-TU-Delft/NiceProp/tree/main/docs/NiceProp_logo.png&s=100)
+
 NiceProp is an object-oriented Python program for teaching and research in the field of Non-Ideal Compressible Fluid Dynamics (NICFD).
 
 ![python 3.2](https://img.shields.io/badge/version-latest-blue.svg) ![python 3.2](https://img.shields.io/badge/python-3.7-blue.svg) ![platform Linux,_MacOs,_Win64](https://img.shields.io/badge/platform-Linux,_macos,_win64-blue.svg)
@@ -22,7 +23,7 @@ efficiently design more complex flow devices, e.g. supersonic stators for ORC tu
 * **A. Giuffre'**, PhD Researcher, Propulsion & Power, TU Delft
 * **M. Pini**, Assistant Professor, Propulsion & Power, TU Delft
 
-[![Link MailTo](https://img.shields.io/badge/MailTo-developers-blue.svg)](mailto:a.giuffre@tudelft.nl?subject=NiceProp:Query)
+[![Link MailTo](https://img.shields.io/badge/MailTo-developers-blue.svg)](mailto:a.giuffre@tudelft.nl;m.pini@tudelft.nl?subject=NiceProp:Query)
 
 ---
 
