@@ -1,5 +1,4 @@
-# NiceProp 
-![Thermodynamic](./docs/NiceProp_logo.png)
+# NiceProp <img src="https://github.com/Propulsion-Power-TU-Delft/NiceProp/blob/main/docs/NiceProp_logo.png" width="150" height="150">
 
 NiceProp is an object-oriented Python program for teaching and research in the field of Non-Ideal Compressible Fluid Dynamics (NICFD).
 
