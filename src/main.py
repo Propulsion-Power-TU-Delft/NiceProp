@@ -22,14 +22,14 @@ class App(tk.Frame):
     """ Class to take user input from a GUI and run the main program """
     def __init__(self, master=None, **kw):
         tk.Frame.__init__(self, master=master, **kw)
-        tk.Label(self, text=" \n ", justify='left', font=('calibre', 14)).grid(row=0, column=0)
-        tk.Label(self, text="Configuration file", justify='left', font=('calibre', 14)).grid(row=1, column=0)
-        self.q1 = tk.Entry(self, font=('calibre', 14))
+        tk.Label(self, text=" \n ", justify='left', font=('calibre', 12)).grid(row=0, column=0)
+        tk.Label(self, text="Configuration file", justify='left', font=('calibre', 12)).grid(row=1, column=0)
+        self.q1 = tk.Entry(self, font=('calibre', 12))
         self.q1.grid(row=1, column=1)
-        tk.Label(self, text="Input name without extension", justify='left', font=('calibre', 14)).grid(row=2, column=0)
+        tk.Label(self, text="Input name without extension", justify='left', font=('calibre', 12)).grid(row=2, column=0)
         tk.Label(self, text="   The file must be located in input directory",
-                 justify='left', font=('calibre', 14)).grid(row=3, column=0)
-        tk.Button(self, text="Run", command=self.run, justify='left', font=('calibre', 14)).grid(row=4, column=1)
+                 justify='left', font=('calibre', 12)).grid(row=3, column=0)
+        tk.Button(self, text="Run", command=self.run, justify='left', font=('calibre', 12)).grid(row=4, column=1)
 
     def run(self):
         """ Run the main program and retrieve the execution time """
@@ -82,7 +82,7 @@ class App(tk.Frame):
 
 if __name__ == '__main__':
     root = tk.Tk()
-    root.geometry("620x200")
+    root.geometry("500x180")
     root.title('Welcome to NiceProp!')
     App(root).grid()
     root.mainloop()
