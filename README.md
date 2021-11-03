@@ -80,13 +80,15 @@ NiceProp can be used to analyze the evolution of isentropic flow quantities alon
 
 - In order to specify the nozzle geometry as input, the user must provide a file named nozzleCoordinates.txt in the input directory. The file must be formatted as the one shipped with the software. Note that multiple nozzle geometries could be specified in the same coordinate file, by separating them with the header NEW NOZZLE GEOMETRY.
 
+Please refer to method NozzleExpansion in module isentropic_process.py for further information.
+
 ---
 
 ### Compression in radial and conical diffuser
 ![Diffuser](./docs/diffuser_compression.jpg)
 
 NiceProp can be used to analyze the evolution of isentropic flow quantities along a conical or a radial diffuser. The vaneless diffuser is assumed to be located after the impeller of a compressor stage. Once the total-to-static compression ratio of the transformation is specified, together with the target pressure recovery of the diffuser, the outlet flow velocity and the mass flow rate, the inlet and outlet passage areas are computed.
-Then, the conical diffuser geometry is determined by setting the value of the semi-aperture angle, while the radial diffuser geometry is computed by specifying the values of the inlet flow angle and the non-dimensional passage height, see method DiffuserCompression in module isentropic_process.py.
+Then, the conical diffuser geometry is determined by setting the value of the semi-aperture angle, while the radial diffuser geometry is computed by specifying the values of the inlet flow angle and the non-dimensional passage height. Please refer to method DiffuserCompression in module isentropic_process.py for further information.
 
 ---
 
