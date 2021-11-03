@@ -12,6 +12,7 @@
 import CoolProp
 from src.IO import *
 from src.plot import *
+import src.geometry as geo
 import scipy.optimize as opt
 from scipy.interpolate import UnivariateSpline
 
@@ -29,7 +30,6 @@ class IsentropicFlowModel:
         - NozzleExpansion
         - DiffuserCompression
         - FindSonicState
-        - NozzleGeometry
         - NozzleEquations
         - ConicalDiffuserEquations
         - RadialDiffuserEquations
@@ -70,9 +70,7 @@ class IsentropicFlowModel:
         self.R_diff = np.zeros((len(self.thermo.Tt_in), self.thermo.samples))
 
     def IdealProcess(self):
-        """
-        Given the inlet and outlet states, compute flow quantities along an ideal expansion/compression.
-        """
+        """ Given the inlet and outlet states, compute flow quantities along an ideal expansion/compression """
         print("\n Computing ideal process(es) ...")
 
         # iterate over the selected inlet states
@@ -189,7 +187,6 @@ class IsentropicFlowModel:
                 A_out = self.massflow[ii] / (D_out * V_out)
 
                 # define nozzle geometry
-                R_norm = np.zeros(self.thermo.samples)
                 if self.geometry == 'rectangular':
                     R_in = A_in / 2
                     R_throat = A_throat / 2
@@ -203,29 +200,26 @@ class IsentropicFlowModel:
                 R_throat_vec = np.append(R_throat_vec, R_throat)
 
                 while True:
-                    # inlet to throat
-                    data = (k_in, 1, R_in / R_throat, 0.0075)
-                    a, b, c, d = opt.fsolve(self.NozzleGeometry, (0.1, 0.1, 0.1, 0.1),
-                                            args=data, full_output=False, xtol=1.0e-04)
-                    x_in = np.linspace(0, k_in, int(self.thermo.samples / 2))
-                    R_norm[0:int(self.thermo.samples / 2)] = a + b * np.tanh(c * x_in[::-1] - d)
+                    # define nozzle geometry
+                    # TODO: ADD TREATMENT OF PURELY CONVERGENT NOZZLE
+                    # TODO: ADD INTERACTIVE CONTROL OF CONTROL POINTS, RATHER THAN OF k_in, k_out
+                    inlet = [0.0, R_in]
+                    throat = [k_in * R_throat, R_throat]
+                    outlet = [(k_in + k_out) * R_throat, R_out]
+                    nozzle = geo.NozzleGeometry(inlet, throat, outlet, self.thermo.samples)
+                    nozzle.setBezierProfile()
+                    self.x_norm[ii, :] = nozzle.x_norm
+                    self.R_norm[ii, :] = nozzle.y_norm
 
-                    # throat to outlet
-                    data = (k_out, 1, R_out / R_throat, 0.0075)
-                    a, b, c, d = opt.fsolve(self.NozzleGeometry, (0.1, 0.1, 0.1, 0.1),
-                                            args=data, full_output=False, xtol=1.0e-04)
-                    x_out = np.linspace(0, k_out, int(self.thermo.samples / 2) + 1)
-                    R_norm[int(self.thermo.samples / 2):] = a + b * np.tanh(c * x_out[1:] - d)
-
-                    # inlet to outlet
-                    self.x_norm[ii, 0:int(self.thermo.samples / 2)] = x_in
-                    self.x_norm[ii, int(self.thermo.samples / 2):] = x_out[1:] + x_in[-1]
-                    spl = UnivariateSpline(self.x_norm[ii, :], R_norm, s=0)
-                    self.R_norm[ii, :] = spl(self.x_norm[ii, :])
                     fig, ax = plt.subplots()
                     ax.plot(self.x_norm[ii, :], self.R_norm[ii, :], lw=2, color='black')
                     ax.plot(self.x_norm[ii, :], -self.R_norm[ii, :], lw=2, color='black')
+                    # ax.scatter(nozzle.x_cp_converging / R_throat, nozzle.y_cp_converging / R_throat, c='red')
+                    # ax.scatter(nozzle.x_cp_diverging / R_throat, nozzle.y_cp_diverging / R_throat, c='red')
+                    ax.axis('square')
                     ax.grid(1)
+                    ax.set_xlabel(r'$x_\mathrm{norm}$ [-]')
+                    ax.set_ylabel(r'$y_\mathrm{norm}$ [-]')
                     plt.show()
                     flag = input("\n Is the nozzle shape ok? (y/n) ")
                     if flag == "y" or flag == 'Y':
@@ -259,19 +253,19 @@ class IsentropicFlowModel:
                     self.P_vec[ii, jj] = opt.fsolve(self.NozzleEquations, (self.P_vec[ii, jj - 1]),
                                                     args=data, full_output=False, xtol=1.0e-08)
 
-            # smoothing of P in the neighbourhood of the throat
-            base_unit = int(self.thermo.samples / 10)
-            throat_idx = int(self.thermo.samples / 2 - 1)
-            k_in = self.x_norm[ii, throat_idx] - self.x_norm[ii, 0]
-            k_out = self.x_norm[ii, -1] - self.x_norm[ii, throat_idx]
-            inlet_idx = throat_idx - int(base_unit * k_out / k_in)
-            outlet_idx = throat_idx + base_unit
-            P_vec = np.append(self.P_vec[ii, 0:inlet_idx], self.P_vec[ii, throat_idx])
-            P_vec = np.append(P_vec, self.P_vec[ii, outlet_idx:])
-            x_tmp = np.append(self.x_norm[ii, 0:inlet_idx], self.x_norm[ii, throat_idx])
-            x_tmp = np.append(x_tmp, self.x_norm[ii, outlet_idx:])
-            spl = UnivariateSpline(x_tmp, P_vec, s=0)
-            self.P_vec[ii, :] = spl(self.x_norm[ii, :])
+            # # smoothing of P in the neighbourhood of the throat
+            # base_unit = int(self.thermo.samples / 10)
+            # throat_idx = int(self.thermo.samples / 2 - 1)
+            # k_in = self.x_norm[ii, throat_idx] - self.x_norm[ii, 0]
+            # k_out = self.x_norm[ii, -1] - self.x_norm[ii, throat_idx]
+            # inlet_idx = throat_idx - int(base_unit * k_out / k_in)
+            # outlet_idx = throat_idx + base_unit
+            # P_vec = np.append(self.P_vec[ii, 0:inlet_idx], self.P_vec[ii, throat_idx])
+            # P_vec = np.append(P_vec, self.P_vec[ii, outlet_idx:])
+            # x_tmp = np.append(self.x_norm[ii, 0:inlet_idx], self.x_norm[ii, throat_idx])
+            # x_tmp = np.append(x_tmp, self.x_norm[ii, outlet_idx:])
+            # spl = UnivariateSpline(x_tmp, P_vec, s=0)
+            # self.P_vec[ii, :] = spl(self.x_norm[ii, :])
 
             # compute thermodynamic properties along the isentropic expansion
             for jj in range(self.thermo.samples):
@@ -458,25 +452,6 @@ class IsentropicFlowModel:
             res = 10
 
         return res
-
-    def NozzleGeometry(self, p, *data):
-        """
-        Non-linear system of eqs. determining the nozzle profile from inlet to throat or from throat to outlet.
-        Fit tanh function with null derivative at both boundaries.
-        """
-        x_out, R_in, R_out, toll = data
-        a, b, c, d = p
-
-        # R(0) = R_throat
-        dx1 = (a + b * np.tanh(-d)) - R_in
-        # R(x_out) = R_out
-        dx2 = (a + b * np.tanh(c * x_out - d)) - R_out
-        # dR/dx|0 --> 0
-        dx3 = b * c / (np.cosh(d) ** 2) - toll
-        # dR/dx|x_out --> 0
-        dx4 = b * c / (np.cosh(d - c * x_out) ** 2) - toll
-
-        return dx1, dx2, dx3, dx4
 
     def NozzleEquations(self, p, *data):
         """
