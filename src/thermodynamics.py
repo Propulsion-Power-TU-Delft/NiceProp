@@ -60,6 +60,8 @@ class ThermodynamicModel:
         self.gamma_Tv = np.zeros((self.samples, self.samples))
         self.Eckert = np.zeros((self.samples, self.samples))
         self.Gruneisen = np.zeros((self.samples, self.samples))
+        self.mu = np.zeros((self.samples, self.samples))
+        self.k = np.zeros((self.samples, self.samples))
 
         # compute inlet state and initialize outlet state
         self.Pt_in = np.zeros(len(settings['inlet input 1']))
@@ -90,7 +92,7 @@ class ThermodynamicModel:
 
     def TsContour(self):
         """
-        Compute non-ideality factors in the reduced T-s thermodynamic plane.
+        Compute non-ideality factors and normalized transport properties in the reduced T-s thermodynamic plane.
 
         Notes:
         - self.process: 'compression' or 'expansion'
@@ -102,7 +104,8 @@ class ThermodynamicModel:
         - self.Tr_vec: array defining the range of reduced T over which the non-ideality factors are computed
         - self.sr_vec: array defining the range of reduced s over which the non-ideality factors are computed
         """
-        print("\n Computing non-ideality factors in the reduced T-s thermodynamic plane for: %8s" % self.fluid)
+        print("\n Computing non-ideality factors and normalized transport properties "
+              "in the reduced T-s thermodynamic plane for: %8s" % self.fluid)
         T_vec = self.Tr_vec * self.Tc
         s_vec = self.sr_vec * self.sc
 
@@ -210,6 +213,8 @@ class ThermodynamicModel:
                             self.Eckert[ii, jj] = self.EoS.speed_sound() ** 2 / (cp * T_vec[ii])
                             self.Gruneisen[ii, jj] = np.sqrt(self.Eckert[ii, jj] * (self.FundDerGamma[ii, jj] - 1) /
                                                              self.MachEdge ** 2)
+                            self.mu[ii, jj] = self.EoS.viscosity()
+                            self.k[ii, jj] = self.EoS.conductivity()
                         except:
                             self.FundDerGamma[ii, jj] = np.nan
                             self.Z[ii, jj] = np.nan
@@ -219,6 +224,8 @@ class ThermodynamicModel:
                             self.gamma_Tv[ii, jj] = np.nan
                             self.Eckert[ii, jj] = np.nan
                             self.Gruneisen[ii, jj] = np.nan
+                            self.mu[ii, jj] = np.nan
+                            self.k[ii, jj] = np.nan
                     else:
                         self.FundDerGamma[ii, jj] = np.nan
                         self.Z[ii, jj] = np.nan
@@ -228,6 +235,8 @@ class ThermodynamicModel:
                         self.gamma_Tv[ii, jj] = np.nan
                         self.Eckert[ii, jj] = np.nan
                         self.Gruneisen[ii, jj] = np.nan
+                        self.mu[ii, jj] = np.nan
+                        self.k[ii, jj] = np.nan
             else:
                 for jj in range(self.samples):
                     if s_matrix[jj] >= self.sc:
@@ -251,6 +260,8 @@ class ThermodynamicModel:
                             self.Eckert[ii, jj] = self.EoS.speed_sound() ** 2 / (cp * T_vec[ii])
                             self.Gruneisen[ii, jj] = np.sqrt(self.Eckert[ii, jj] * (self.FundDerGamma[ii, jj] - 1) /
                                                              self.MachEdge ** 2)
+                            self.mu[ii, jj] = self.EoS.viscosity()
+                            self.k[ii, jj] = self.EoS.conductivity()
                         except:
                             self.FundDerGamma[ii, jj] = np.nan
                             self.Z[ii, jj] = np.nan
@@ -260,6 +271,8 @@ class ThermodynamicModel:
                             self.gamma_Tv[ii, jj] = np.nan
                             self.Eckert[ii, jj] = np.nan
                             self.Gruneisen[ii, jj] = np.nan
+                            self.mu[ii, jj] = np.nan
+                            self.k[ii, jj] = np.nan
                     else:
                         self.FundDerGamma[ii, jj] = np.nan
                         self.Z[ii, jj] = np.nan
@@ -269,6 +282,8 @@ class ThermodynamicModel:
                         self.gamma_Tv[ii, jj] = np.nan
                         self.Eckert[ii, jj] = np.nan
                         self.Gruneisen[ii, jj] = np.nan
+                        self.mu[ii, jj] = np.nan
+                        self.k[ii, jj] = np.nan
 
         # plotting
         print("\n Plotting results ...")
@@ -301,11 +316,17 @@ class ThermodynamicModel:
         print("  Creating contour of Gruneisen parameter...")
         self.plotClass.PlotTsContour(self.Gruneisen, 'Gruneisen', '$Gr$ [-]')
 
+        print("  Creating contour of normalized dynamic viscosity...")
+        self.plotClass.PlotTsContour(self.mu/1.802/10**-5, 'Viscosity', '$\mu$ [-]', powerNorm=True)
+
+        print("  Creating contour of normalized thermal conductivity...")
+        self.plotClass.PlotTsContour(self.k/24.76/10**-3, 'Conductivity', '$\kappa$ [-]', powerNorm=True)
+
         return
 
     def PTContour(self):
         """
-        Compute non-ideality factors in the reduced P-T thermodynamic plane.
+        Compute non-ideality factors and normalized transport properties in the reduced P-T thermodynamic plane.
 
         Notes:
         - self.process: 'compression' or 'expansion'
@@ -317,7 +338,8 @@ class ThermodynamicModel:
         - self.Tr_vec: array defining the range of reduced T over which the non-ideality factors are computed
         - self.Pr_vec: array defining the range of reduced P over which the non-ideality factors are computed
         """
-        print("\n Computing non-ideality factors in the reduced P-T thermodynamic plane for: %8s" % self.fluid)
+        print("\n Computing non-ideality factors and normalized transport properties "
+              "in the reduced P-T thermodynamic plane for: %8s" % self.fluid)
         T_grid = np.zeros((self.samples, self.samples))
         P_grid = np.zeros((self.samples, self.samples))
         T_sat = np.linspace(self.Tc * self.Tr_vec[0], self.Tc, int(self.samples / 2))
@@ -408,6 +430,8 @@ class ThermodynamicModel:
                 self.Eckert[ii, jj] = self.EoS.speed_sound() ** 2 / (cp * T_grid[ii, jj])
                 self.Gruneisen[ii, jj] = np.sqrt(self.Eckert[ii, jj] * (self.FundDerGamma[ii, jj] - 1) /
                                                  self.MachEdge ** 2)
+                self.mu[ii, jj] = self.EoS.viscosity()
+                self.k[ii, jj] = self.EoS.conductivity()
         # plotting
         print("\n Plotting results ...")
         self.plotClass = Plot(T_grid, P_grid, self.Tc, self.Pc, T_sat, P_sat, self.Tt_in, self.T_out,
@@ -437,6 +461,12 @@ class ThermodynamicModel:
 
         print("  Creating contour of Gruneisen parameter...")
         self.plotClass.PlotPTContour(self.Gruneisen, 'Gruneisen', '$Gr$ [-]')
+
+        print("  Creating contour of normalized dynamic viscosity...")
+        self.plotClass.PlotPTContour(self.mu/1.802/10**-5, 'Viscosity', '$\mu$ [-]', powerNorm=True)
+
+        print("  Creating contour of normalized thermal conductivity...")
+        self.plotClass.PlotPTContour(self.k/24.76/10**-3, 'Conductivity', '$\kappa$ [-]', powerNorm=True)
 
         return
 

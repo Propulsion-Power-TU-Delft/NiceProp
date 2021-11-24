@@ -1,6 +1,6 @@
 ***************************** BASIC SETTINGS *****************************
 Working fluid
-R1233zd(E)
+R1233zdE
 EoS used to compute the thermodynamic properties: 'PR', 'SRK', 'HEOS' or 'REFPROP'
 REFPROP
 Thermodynamic plane: 'Ts' or 'PT'
