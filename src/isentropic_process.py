@@ -214,13 +214,16 @@ class IsentropicFlowModel:
                     fig, ax = plt.subplots()
                     ax.plot(self.x_norm[ii, :], self.R_norm[ii, :], lw=2, color='black')
                     ax.plot(self.x_norm[ii, :], -self.R_norm[ii, :], lw=2, color='black')
-                    # ax.scatter(nozzle.x_cp_converging / R_throat, nozzle.y_cp_converging / R_throat, c='red')
-                    # ax.scatter(nozzle.x_cp_diverging / R_throat, nozzle.y_cp_diverging / R_throat, c='red')
+                    ax.scatter(nozzle.x_cp_converging / R_throat, nozzle.y_cp_converging / R_throat,
+                               c='red', label='control points')
+                    ax.scatter(nozzle.x_cp_diverging / R_throat, nozzle.y_cp_diverging / R_throat, c='red')
                     ax.axis('square')
                     ax.grid(1)
                     ax.set_xlabel(r'$x_\mathrm{norm}$ [-]')
                     ax.set_ylabel(r'$y_\mathrm{norm}$ [-]')
+                    plt.legend()
                     plt.show()
+
                     flag = input("\n Is the nozzle shape ok? (y/n) ")
                     if flag == "y" or flag == 'Y':
                         break

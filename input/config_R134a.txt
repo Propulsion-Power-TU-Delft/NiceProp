@@ -11,9 +11,9 @@ Thermodynamic process(es): 'compression' or 'expansion' or 'None'
 compression
 Do you want to design nozzle/diffuser for expansion/compression process? Y/N
 Y
-Total-to-total volumetric flow ratio (it must be 0 if using pressure ratio)
+Total-to-static volumetric flow ratio (it must be 0 if using pressure ratio)
 0.0
-Total-to-total pressure ratio (it must be 0 if using volumetric flow ratio)
+Total-to-static pressure ratio (it must be 0 if using volumetric flow ratio)
 5.0
 Inlet state definition: 'Ts' or 'PT' (independent from the choice of Thermodynamic plane)
 PT
