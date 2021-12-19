@@ -63,11 +63,13 @@ REFPROP library must be manually compiled if working with Linux or Mac OS. Pleas
 ---
 
 ### How to get started
-1. Run main.py and specify the name of your configuration file
-  
-2. Press the Run button
+1. Run main.py
 
-3. Visualize results in the output folder named after the selected working fluid
+2. Specify the name of the configuration file (located by default in the input folder), or enter the input data in the GUI
+  
+3. Press the Run button
+
+4. Visualize results in the output folder named after the selected working fluid
 
 ---
 
@@ -76,7 +78,7 @@ REFPROP library must be manually compiled if working with Linux or Mac OS. Pleas
 
 NiceProp can be used to analyze the evolution of isentropic flow quantities along a converging-diverging nozzle. The nozzle shape can be either provided by the user or designed by the tool itselft, by editing the last entry of isentropic transformation in the configuration file.
 
-- If the nozzle geometry is not provided as input, NiceProp tries to perform a converging-diverging nozzle design with the provided input and the default settings and plots the result to screen. Once closed the figure, NiceProp prints to screen: 'Is the nozzle shape ok? (y/n)'. If the user accepts the proposed nozzle geometry, the execution of the program proceeds, otherwise the user is asked to specify new values for the variables k_in, k_out which characterize the non-dimensional nozzle shape. This process is iterated until a satisfactory nozzle shape is obtained.
+- If the nozzle geometry is not provided as input, NiceProp performs a converging-diverging nozzle design with the provided input and the default settings and plots the result to screen. Once closed the figure, NiceProp prints to screen: 'Is the nozzle shape ok? (y/n)'. If the user accepts the proposed nozzle geometry, the execution of the program proceeds, otherwise the user is asked to specify new values for the variables k_in, k_out which characterize the non-dimensional nozzle shape. This process is iterated until a satisfactory nozzle shape is obtained.
 
 - In order to specify the nozzle geometry as input, the user must provide a file named nozzleCoordinates.txt in the input directory. The file must be formatted as the one shipped with the software. Note that multiple nozzle geometries could be specified in the same coordinate file, by separating them with the header NEW NOZZLE GEOMETRY.
 
@@ -93,13 +95,17 @@ Then, the conical diffuser geometry is determined by setting the value of the se
 ---
 
 ### Notes
-1. The success of a NiceProp run is subordinated to the convergence of each EoS call inside the code. In turn, be careful to select the limits of Pr, Tr, sr axes and the reduced inlet conditions within the admissible range of the selected EoS. Convergence is not guaranteed in the extreme proximity of the critical point and within the two-phase region.
+1. The success of a NiceProp run is subordinated to the convergence of each EoS call inside the code. In turn, some care is required when selecting the limits of Pr, Tr, sr axes and the reduced inlet conditions. Convergence is not guaranteed in the extreme proximity of the critical point and within the two-phase region.
 
-2. In the configuration file, the number of entries related to inlet state definition, labels of the thermodynamic processes, mass flow rate, and flow velocity must be coincident. 
+2. The user can choose to specify the pressure ratio or the volumetric flow ratio of the prescribed thermodynamic transformation. Once chosen the desired input, the other must be left to zero.
 
-3. The number of samples (first entry of contour plot settings in the configuration file) is the parameter mainly affecting the computational cost. The recommended settings are: 100 samples to obtain results almost in real time, 1000 samples to obtain smooth contour plots. 
+3. The prescribed number of entries related to inlet state definition, labels of the thermodynamic processes, mass flow rate, and flow velocity must be consistent. 
+
+4. The available choices for nozzle geometry are: 'rectangular' and 'circular'. The available choices for diffuser geometry are: 'conical' and 'radial'.
+
+5. The number of samples is the parameter mainly affecting the computational cost. The recommended settings are: 100 samples to obtain results almost in real time, 1000 samples to obtain smooth contour plots. 
 
 ---
 
 ### Citation
-Giuffre', A., and Pini, M., 2021. "NiceProp: An Interactive Python-based Educational Tool for Non-Ideal Compressible Fluid Dynamics". SoftwareX
+A. Giuffre’, and M. Pini, NiceProp: An Interactive Python-Based Educational Tool for Non-Ideal Compressible Fluid Dynamics. SoftwareX(2021) 100897, https://doi.org/10.1016/j.softx.2021.100897
