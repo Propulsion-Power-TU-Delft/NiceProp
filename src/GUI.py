@@ -11,9 +11,9 @@
 
 import pyfiglet
 import tkinter as tk
-from src.IO import *
-import src.thermodynamics as thermo
-import src.isentropic_process as isos
+from IO import *
+import thermodynamics as thermo
+import isentropic_process as isos
 
 
 class App(tk.Frame):

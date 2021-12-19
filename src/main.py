@@ -11,7 +11,7 @@
 
 import time
 import warnings
-from src.GUI import *
+from GUI import *
 
 
 if __name__ == '__main__':

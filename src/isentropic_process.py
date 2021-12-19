@@ -10,9 +10,9 @@
 
 
 import CoolProp
-from src.IO import *
-from src.plot import *
-import src.geometry as geo
+from IO import *
+from plot import *
+import geometry as geo
 import scipy.optimize as opt
 from scipy.interpolate import UnivariateSpline
 

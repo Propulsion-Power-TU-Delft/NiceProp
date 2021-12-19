@@ -10,7 +10,7 @@
 
 
 import CoolProp
-from src.plot import *
+from plot import *
 from tqdm import tqdm
 
 
@@ -168,7 +168,7 @@ class ThermodynamicModel:
         T_sat = np.linspace(min(T_vec), self.Tc, len(s_sat_v))
         T_sat = np.concatenate((T_sat, T_sat[::-1]))
 
-        if (self.process == 'expansion') or (self.process == 'compression'):
+        if ((self.process == 'expansion') or (self.process == 'compression')) and (self.lib == 'REFPROP'):
             # compute critical isobaric line
             for jj in range(self.samples):
                 self.EoS.update(CoolProp.PSmass_INPUTS, self.Pc, s_vec[jj])
