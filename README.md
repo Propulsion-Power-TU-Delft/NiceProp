@@ -97,13 +97,15 @@ Then, the conical diffuser geometry is determined by setting the value of the se
 ### Notes
 1. The success of a NiceProp run is subordinated to the convergence of each EoS call inside the code. In turn, some care is required when selecting the limits of Pr, Tr, sr axes and the reduced inlet conditions. Convergence is not guaranteed in the extreme proximity of the critical point and within the two-phase region.
 
-2. The user can choose to specify the pressure ratio or the volumetric flow ratio of the prescribed thermodynamic transformation. Once chosen the desired input, the other must be left to zero.
+2. NiceProp can be used with both the EoS implemented in REFPROP and CoolProp. However, the code has been developed and extensively tested by using the EoS implemented in REFPROP. A working example that makes use of CoolProp HEOS can be found in input/config_Toluene. The correct functioning of the other examples provided in the input folder is not guaranteed by using an EoS different from the one implemented in REFPROP. 
 
-3. The prescribed number of entries related to inlet state definition, labels of the thermodynamic processes, mass flow rate, and flow velocity must be consistent. 
+3. The user can choose to specify the pressure ratio or the volumetric flow ratio of the prescribed thermodynamic transformation. Once chosen the desired input, the other must be left to zero.
 
-4. The available choices for nozzle geometry are: 'rectangular' and 'circular'. The available choices for diffuser geometry are: 'conical' and 'radial'.
+4. The prescribed number of entries related to inlet state definition, labels of the thermodynamic processes, mass flow rate, and flow velocity must be consistent. 
 
-5. The number of samples is the parameter mainly affecting the computational cost. The recommended settings are: 100 samples to obtain results almost in real time, 1000 samples to obtain smooth contour plots. 
+5. The available choices for nozzle geometry are: 'rectangular' and 'circular'. The available choices for diffuser geometry are: 'conical' and 'radial'.
+
+6. The number of samples is the parameter mainly affecting the computational cost. The recommended settings are: 100 samples to obtain results almost in real time, 1000 samples to obtain smooth contour plots. 
 
 ---
 
