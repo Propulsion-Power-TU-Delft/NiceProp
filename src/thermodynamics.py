@@ -115,34 +115,34 @@ class ThermodynamicModel:
         s_sat_l = []
 
         # compute outlet state
-        if self.alpha == 0.0:        # transformation defined by beta
+        if np.all(self.alpha == 0.0):        # transformation defined by beta
             if self.process == 'expansion':
                 plot_process = True
-                self.P_out = self.Pt_in / self.beta
                 for ii in range(len(self.Tt_in)):
+                    self.P_out[ii] = self.Pt_in[ii] / self.beta[ii]
                     self.EoS.update(CoolProp.PSmass_INPUTS, self.P_out[ii], self.s_in[ii])
                     self.T_out[ii] = self.EoS.T()
             elif self.process == 'compression':
                 plot_process = True
-                self.P_out = self.Pt_in * self.beta
                 for ii in range(len(self.Tt_in)):
+                    self.P_out[ii] = self.Pt_in[ii] * self.beta[ii]
                     self.EoS.update(CoolProp.PSmass_INPUTS, self.P_out[ii], self.s_in[ii])
                     self.T_out[ii] = self.EoS.T()
             else:
                 plot_process = False
 
-        elif self.beta == 0.0:       # transformation defined by alpha
+        elif np.all(self.beta == 0.0):       # transformation defined by alpha
             if self.process == 'expansion':
                 plot_process = True
-                self.D_out = self.Dt_in / self.alpha
                 for ii in range(len(self.Tt_in)):
+                    self.D_out[ii] = self.Dt_in[ii] / self.alpha[ii]
                     self.EoS.update(CoolProp.DmassSmass_INPUTS, self.D_out[ii], self.s_in[ii])
                     self.T_out[ii] = self.EoS.T()
                     self.P_out[ii] = self.EoS.p()
             elif self.process == 'compression':
                 plot_process = True
-                self.D_out = self.Dt_in * self.alpha
                 for ii in range(len(self.Tt_in)):
+                    self.D_out[ii] = self.Dt_in[ii] * self.alpha[ii]
                     self.EoS.update(CoolProp.DmassSmass_INPUTS, self.D_out[ii], self.s_in[ii])
                     self.T_out[ii] = self.EoS.T()
                     self.P_out[ii] = self.EoS.p()
@@ -150,7 +150,7 @@ class ThermodynamicModel:
                 plot_process = False
         else:
             raise ValueError("The thermodynamic transformation must be defined in terms of alpha or beta "
-                             "(the other entry must be null)")
+                             "(all entries in the other option must be null)")
 
         # compute the saturation curve
         for ii in range(self.samples):
@@ -348,34 +348,34 @@ class ThermodynamicModel:
         P_sat = np.zeros(int(self.samples / 2))
 
         # compute outlet state
-        if self.alpha == 0.0:  # transformation defined by beta
+        if np.all(self.alpha == 0.0):  # transformation defined by beta
             if self.process == 'expansion':
                 plot_process = True
-                self.P_out = self.Pt_in / self.beta
                 for ii in range(len(self.Tt_in)):
+                    self.P_out[ii] = self.Pt_in[ii] / self.beta[ii]
                     self.EoS.update(CoolProp.PSmass_INPUTS, self.P_out[ii], self.s_in[ii])
                     self.T_out[ii] = self.EoS.T()
             elif self.process == 'compression':
                 plot_process = True
-                self.P_out = self.Pt_in * self.beta
                 for ii in range(len(self.Tt_in)):
+                    self.P_out[ii] = self.Pt_in[ii] * self.beta[ii]
                     self.EoS.update(CoolProp.PSmass_INPUTS, self.P_out[ii], self.s_in[ii])
                     self.T_out[ii] = self.EoS.T()
             else:
                 plot_process = False
 
-        elif self.beta == 0.0:  # transformation defined by alpha
+        elif np.all(self.beta == 0.0):  # transformation defined by alpha
             if self.process == 'expansion':
                 plot_process = True
-                self.D_out = self.Dt_in / self.alpha
                 for ii in range(len(self.Tt_in)):
+                    self.D_out[ii] = self.Dt_in[ii] / self.alpha[ii]
                     self.EoS.update(CoolProp.DmassSmass_INPUTS, self.D_out[ii], self.s_in[ii])
                     self.T_out[ii] = self.EoS.T()
                     self.P_out[ii] = self.EoS.p()
             elif self.process == 'compression':
                 plot_process = True
-                self.D_out = self.Dt_in * self.alpha
                 for ii in range(len(self.Tt_in)):
+                    self.D_out[ii] = self.Dt_in[ii] * self.alpha[ii]
                     self.EoS.update(CoolProp.DmassSmass_INPUTS, self.D_out[ii], self.s_in[ii])
                     self.T_out[ii] = self.EoS.T()
                     self.P_out[ii] = self.EoS.p()
@@ -383,7 +383,7 @@ class ThermodynamicModel:
                 plot_process = False
         else:
             raise ValueError("The thermodynamic transformation must be defined in terms of alpha or beta "
-                             "(the other entry must be null)")
+                             "(all entries in the other option must be null)")
 
         for jj in range(len(T_sat)):
             self.EoS.update(CoolProp.QT_INPUTS, 1.0, T_sat[jj])

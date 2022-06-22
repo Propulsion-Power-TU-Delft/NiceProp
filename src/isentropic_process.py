@@ -75,19 +75,25 @@ class IsentropicFlowModel:
 
         # iterate over the selected inlet states
         for ii in range(len(self.thermo.Tt_in)):
-            if self.thermo.alpha != 0:
+            if np.all(self.thermo.alpha != 0):
                 self.D_vec[ii, :] = np.linspace(self.thermo.Dt_in[ii], self.thermo.D_out[ii], self.thermo.samples)
-            elif self.thermo.beta != 0:
+            elif np.all(self.thermo.beta != 0):
                 self.P_vec[ii, :] = np.linspace(self.thermo.Pt_in[ii], self.thermo.P_out[ii], self.thermo.samples)
+            else:
+                raise ValueError("The thermodynamic transformation must be defined in terms of alpha or beta "
+                                 "(all entries in the other option must be null)")
 
             # compute thermodynamic properties along the isentropic expansion
             for jj in range(self.thermo.samples):
-                if self.thermo.alpha != 0:
+                if np.all(self.thermo.alpha != 0):
                     self.thermo.EoS.update(CoolProp.DmassSmass_INPUTS, self.D_vec[ii, jj], self.thermo.s_in[ii])
                     self.P_vec[ii, jj] = self.thermo.EoS.p()
-                elif self.thermo.beta != 0:
+                elif np.all(self.thermo.beta != 0):
                     self.thermo.EoS.update(CoolProp.PSmass_INPUTS, self.P_vec[ii, jj], self.thermo.s_in[ii])
                     self.D_vec[ii, jj] = self.thermo.EoS.rhomass()
+                else:
+                    raise ValueError("The thermodynamic transformation must be defined in terms of alpha or beta "
+                                     "(all entries in the other option must be null)")
 
                 self.h_vec[ii, jj] = self.thermo.EoS.hmass()
                 self.T_vec[ii, jj] = self.thermo.EoS.T()

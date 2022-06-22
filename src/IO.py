@@ -35,9 +35,9 @@ def readConfigFile(config_file):
     file.readline()
     settings['design'] = file.readline().split()[0]
     file.readline()
-    settings['alpha'] = float(file.readline())
+    settings['alpha'] = np.asarray(file.readline().split(), dtype=float)
     file.readline()
-    settings['beta'] = float(file.readline())
+    settings['beta'] = np.asarray(file.readline().split(), dtype=float)
     file.readline()
     settings['inlet thermodynamic plane'] = file.readline().split()
     file.readline()
