@@ -1,5 +1,6 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
+from typing import TextIO
 
 #############################################################################
 # NiceProp - Interactively learning NICFD
@@ -17,8 +18,10 @@ import os
 
 class Plot:
     """ Class to plot results computed with the methods of classes ThermodynamicModel and IsentropicFlowModel """
+
     def __init__(self, x, y, xc, yc, x_sat, y_sat, x_in, x_out, y_in, y_out, x_iso, y_iso, labels,
-                 plot_process, sc_iso=np.array([]), Tc_iso=np.array([]), cmap='viridis'):
+                 plot_process, xc_iso=np.array([]), yc_iso=np.array([]),
+                 x_Widom=np.array([]), y_Widom=np.array([]), cmap='viridis'):
         """
         Arguments:
         :param x: 2D array defining the x-axis of the grid used for contour plots
@@ -39,8 +42,10 @@ class Plot:
         :param plot_process: flag to activate/deactivate plot of isentropic process(es) over the contour plots
 
         Optional arguments:
-        :param sc_iso: 1D array defining the x-coordinate of the critical line in the T-s plane
-        :param Tc_iso: 1D array defining the y-coordinate of the critical line in the T-s plane
+        :param xc_iso: 1D array defining the x-coordinate of the critical line
+        :param yc_iso: 1D array defining the y-coordinate of the critical line
+        :param x_Widom: 1D array defining the x-coordinate of the Widom line
+        :param y_Widom: 1D array defining the y-coordinate of the Widom line
         :param cmap: colormap used for all the plots
 
         Methods:
@@ -65,8 +70,10 @@ class Plot:
         self.y_out = y_out
         self.x_iso = x_iso
         self.y_iso = y_iso
-        self.sc_iso = sc_iso
-        self.Tc_iso = Tc_iso
+        self.x_Widom = x_Widom
+        self.y_Widom = y_Widom
+        self.xc_iso = xc_iso
+        self.yc_iso = yc_iso
         self.labels = labels
         self.cmap = cmap
         self.plot_process = plot_process
@@ -131,9 +138,10 @@ class Plot:
                 ax.plot([self.x_in[ii] / self.xc, self.x_out[ii] / self.xc],
                         [self.y_in[ii] / self.yc, self.y_out[ii] / self.yc], color='black')
 
-        # plot saturation curve and divide the thermodynamic plane into liquid, vapor and supercritical regions
+        # plot saturation curve, critical isobar, and Widom line
         ax.plot(self.x_sat / self.xc, self.y_sat / self.yc, color='black')
-        ax.plot(self.sc_iso / self.xc, self.Tc_iso / self.yc, linestyle='dashed', color='red')
+        ax.plot(self.xc_iso / self.xc, self.yc_iso / self.yc, linestyle='dashed', color='red')
+        ax.plot(self.x_Widom / self.xc, self.y_Widom / self.yc, linestyle='dashed', color='blue')
 
         # create contour plot of the selected thermodynamic quantity z
         if powerNorm:
@@ -179,6 +187,7 @@ class Plot:
 
         # plot saturation curve and divide the thermodynamic plane into liquid, vapor and supercritical regions
         ax.plot(self.x_sat / self.xc, self.y_sat / self.yc, color='black')
+        ax.plot(self.x_Widom / self.xc, self.y_Widom / self.yc, color='white')
         ax.hlines(1.0, 1.0, np.max(self.x) / self.xc, linestyle='dashed', color='red')
 
         if self.plot_process:
@@ -323,16 +332,15 @@ class Plot:
         """ Plot nozzle shape plus trends of gamma Pv, Mach, Area ratio along the isentropic expansion """
         new_colors = [plt.get_cmap(self.cmap)(1. * i / len(self.labels)) for i in range(len(self.labels))]
 
-        fig1, ax1 = plt.subplots()      # gamma_Pv trend
-        fig2, ax2 = plt.subplots()      # Mach trend
-        fig3, ax3 = plt.subplots()      # non-dimensional nozzle shape
-        fig4, ax4 = plt.subplots()      # normalized A trend
-        fig5, ax5 = plt.subplots()      # Z trend
-        fig6, ax6 = plt.subplots()      # beta and alpha trend
+        fig1, ax1 = plt.subplots()  # gamma_Pv trend
+        fig2, ax2 = plt.subplots()  # Mach trend
+        fig3, ax3 = plt.subplots()  # non-dimensional nozzle shape
+        fig4, ax4 = plt.subplots()  # normalized A trend
+        fig5, ax5 = plt.subplots()  # Z trend
+        fig6, ax6 = plt.subplots()  # beta and alpha trend
 
         # iterate over inlet states
         for ii in range(len(self.labels)):
-
             ax1.plot(x_norm[ii, :], gamma_Pv_vec[ii, :], lw=2, color=new_colors[ii], label=self.labels[ii])
             ax1.plot(x_norm[ii, :], gamma_Pv_mean[ii] * np.ones(len(x_norm[ii, :])),
                      linestyle='dashed', color=new_colors[ii], label=r'$\overline{\gamma}_{Pv}$')
@@ -362,7 +370,7 @@ class Plot:
         ax4.grid(1)
         ax5.grid(1)
         ax6.grid(1)
-        
+
         ax1.set_xlabel(r'$x_\mathrm{norm}$ [-]')
         ax2.set_xlabel(r'$x_\mathrm{norm}$ [-]')
         ax3.set_xlabel(r'$x_\mathrm{norm}$ [-]')
@@ -395,7 +403,7 @@ class Plot:
         fig4.savefig(self.jpeg_dir + '/A_norm.jpeg')
         fig5.savefig(self.jpeg_dir + '/Z.jpeg')
         fig6.savefig(self.jpeg_dir + '/beta_alpha.jpeg')
-        
+
         fig1.savefig(self.tiff_dir + '/gamma_Pv.tiff')
         fig2.savefig(self.tiff_dir + '/Mach.tiff')
         fig3.savefig(self.tiff_dir + '/nozzle.tiff')
@@ -419,11 +427,11 @@ class Plot:
         beta_in_diff = np.zeros(len(self.labels))
         gamma_Pv_in_diff = np.zeros(len(self.labels))
 
-        fig1, ax1 = plt.subplots()      # gamma_Pv trend
-        fig2, ax2 = plt.subplots()      # Z trend
-        fig3, ax3 = plt.subplots()      # Mach trend (diffuser)
-        fig4, ax4 = plt.subplots()      # diffuser shape
-        fig5, ax5 = plt.subplots()      # normalized P trend (diffuser)
+        fig1, ax1 = plt.subplots()  # gamma_Pv trend
+        fig2, ax2 = plt.subplots()  # Z trend
+        fig3, ax3 = plt.subplots()  # Mach trend (diffuser)
+        fig4, ax4 = plt.subplots()  # diffuser shape
+        fig5, ax5 = plt.subplots()  # normalized P trend (diffuser)
         # iterate over inlet states
         for ii in range(len(self.labels)):
             R_norm = R_diff[ii, :] / R_diff[ii, 0]
@@ -448,7 +456,7 @@ class Plot:
         ax3.grid(1)
         ax4.grid(1)
         ax5.grid(1)
-        
+
         ax1.set_xlabel(r'$\beta$ [-]')
         ax2.set_xlabel(r'$\beta$ [-]')
         ax3.set_xlabel(r'$x_\mathrm{norm}$ [-]')
@@ -459,31 +467,31 @@ class Plot:
         ax3.set_ylabel('$M$ [-]')
         ax4.set_ylabel(r'$R_\mathrm{norm}$ [-]')
         ax5.set_ylabel(r'$\beta$ [-]')
-        
+
         handles1, labels1 = ax1.get_legend_handles_labels()
         handles2, labels2 = ax2.get_legend_handles_labels()
         handles3, labels3 = ax3.get_legend_handles_labels()
         handles4, labels4 = ax4.get_legend_handles_labels()
         handles5, labels5 = ax5.get_legend_handles_labels()
-        
+
         ax1.legend(handles1, labels1)
         ax2.legend(handles2, labels2)
         ax3.legend(handles3, labels3)
         ax4.legend(handles4, labels4, loc='center right')
         ax5.legend(handles5, labels5)
-        
+
         fig1.savefig(self.jpeg_dir + '/gamma_Pv.jpeg')
         fig2.savefig(self.jpeg_dir + '/Z.jpeg')
         fig3.savefig(self.jpeg_dir + '/Mach_diff_conical.jpeg')
         fig4.savefig(self.jpeg_dir + '/conical_diffuser.jpeg')
         fig5.savefig(self.jpeg_dir + '/beta_diff_conical.jpeg')
-        
+
         fig1.savefig(self.tiff_dir + '/gamma_Pv.tiff')
         fig2.savefig(self.tiff_dir + '/Z.tiff')
         fig3.savefig(self.tiff_dir + '/Mach_diff_conical.tiff')
         fig4.savefig(self.tiff_dir + '/conical_diffuser.tiff')
         fig5.savefig(self.tiff_dir + '/beta_diff_conical.tiff')
-        
+
         plt.close(fig1)
         plt.close(fig2)
         plt.close(fig3)
@@ -504,12 +512,12 @@ class Plot:
         y_vec = np.zeros((R_diff.shape[0], R_diff.shape[1], 4))
         theta = np.linspace(0, 2 * np.pi, 1000)
 
-        fig1, ax1 = plt.subplots()      # gamma_Pv trend
-        fig2, ax2 = plt.subplots()      # Z trend
-        fig3, ax3 = plt.subplots()      # Mach trend (diffuser)
-        fig4, ax4 = plt.subplots()      # diffuser shape
-        fig5, ax5 = plt.subplots()      # normalized P trend (diffuser)
-        fig6, ax6 = plt.subplots()      # flow angle trend (diffuser)
+        fig1, ax1 = plt.subplots()  # gamma_Pv trend
+        fig2, ax2 = plt.subplots()  # Z trend
+        fig3, ax3 = plt.subplots()  # Mach trend (diffuser)
+        fig4, ax4 = plt.subplots()  # diffuser shape
+        fig5, ax5 = plt.subplots()  # normalized P trend (diffuser)
+        fig6, ax6 = plt.subplots()  # flow angle trend (diffuser)
         # iterate over inlet states
         for ii in range(len(self.labels)):
             R_norm = R_diff[ii, :] / R_diff[ii, 0]
@@ -562,14 +570,14 @@ class Plot:
         ax4.grid(1)
         ax5.grid(1)
         ax6.grid(1)
-        
+
         ax1.set_xlabel(r'$\beta$ [-]')
         ax2.set_xlabel(r'$\beta$ [-]')
         ax3.set_xlabel(r'$R_\mathrm{norm}$ [-]')
         ax4.set_xlabel(r'$x_\mathrm{norm}$ [-]')
         ax5.set_xlabel(r'$R_\mathrm{norm}$ [-]')
         ax6.set_xlabel(r'$R_\mathrm{norm}$ [-]')
-        
+
         ax1.set_ylabel(r'$\gamma_{Pv}$ [-]')
         ax2.set_ylabel('$Z$ [-]')
         ax3.set_ylabel('$M$ [-]')
@@ -577,40 +585,98 @@ class Plot:
         ax5.set_ylabel(r'$\beta$ [-]')
         ax6.set_ylabel(r'$\alpha$ [deg]')
         ax4.axis('square')
-        
+
         handles1, labels1 = ax1.get_legend_handles_labels()
         handles2, labels2 = ax2.get_legend_handles_labels()
         handles3, labels3 = ax3.get_legend_handles_labels()
         handles4, labels4 = ax4.get_legend_handles_labels()
         handles5, labels5 = ax5.get_legend_handles_labels()
         handles6, labels6 = ax6.get_legend_handles_labels()
-        
+
         ax1.legend(handles1, labels1)
         ax2.legend(handles2, labels2)
         ax3.legend(handles3, labels3)
         ax4.legend(handles4, labels4, loc='upper right')
         ax5.legend(handles5, labels5)
         ax6.legend(handles6, labels6)
-        
+
         fig1.savefig(self.jpeg_dir + '/gamma_Pv.jpeg')
         fig2.savefig(self.jpeg_dir + '/Z.jpeg')
         fig3.savefig(self.jpeg_dir + '/Mach_diff_radial.jpeg')
         fig4.savefig(self.jpeg_dir + '/radial_diffuser.jpeg')
         fig5.savefig(self.jpeg_dir + '/beta_diff_radial.jpeg')
         fig6.savefig(self.jpeg_dir + '/angle_diff_radial.jpeg')
-        
+
         fig1.savefig(self.tiff_dir + '/gamma_Pv.tiff')
         fig2.savefig(self.tiff_dir + '/Z.tiff')
         fig3.savefig(self.tiff_dir + '/Mach_diff_radial.tiff')
         fig4.savefig(self.tiff_dir + '/radial_diffuser.tiff')
         fig5.savefig(self.tiff_dir + '/beta_diff_radial.tiff')
         fig6.savefig(self.tiff_dir + '/angle_diff_radial.tiff')
-        
+
         plt.close(fig1)
         plt.close(fig2)
         plt.close(fig3)
         plt.close(fig4)
         plt.close(fig5)
         plt.close(fig6)
+
+        return
+
+    def WriteTsThermoData(self, z):
+        """
+         Write data file in a format that can be opened with, e.g, Tecplot
+         """
+        dat_file = open(self.results_dir + '/TsThermoData.dat', "w+")
+        dat_file.write(' VARIABLES = "s", "T", "Z" \n')
+
+        dat_file.write(' ZONE T = "Z=Z(s,T), single phase region" \n')
+        for ii in range(len(self.y)):
+            for jj in range(len(self.x)):
+                if np.isnan(z[ii, jj]) == False:
+                    dat_file.write(" %10.4f %10.4f %10.4f \n" % (self.x[jj]/self.xc, self.y[ii]/self.yc, z[ii, jj]))
+
+        dat_file.write(' ZONE T = "Saturation curve" \n ')
+        for ii in range(len(self.x_sat)):
+            dat_file.write(" %10.4f %10.4f %10.4f \n" % (self.x_sat[ii]/self.xc, self.y_sat[ii]/self.yc, 1))
+
+        dat_file.write(' ZONE T = "Critical isobar" \n')
+        for ii in range(len(self.xc_iso)):
+            dat_file.write(" %10.4f %10.4f %10.4f \n" % (self.xc_iso[ii]/self.xc, self.yc_iso[ii]/self.yc, 1))
+
+        dat_file.write(' ZONE T = "Widom line" \n')
+        for ii in range(len(self.x_Widom)):
+            dat_file.write(" %10.4f %10.4f %10.4f \n" % (self.x_Widom[ii]/self.xc, self.y_Widom[ii]/self.yc, 1))
+
+        dat_file.close()
+
+        return
+
+    def WritePTThermoData(self, z):
+        """
+         Write data file in a format that can be opened with, e.g, Tecplot
+         """
+        dat_file = open(self.results_dir + '/PTThermoData.dat', "w+")
+        dat_file.write(' VARIABLES = "T", "P", "Z" \n')
+
+        dat_file.write(' ZONE T = "Z=Z(P,T), single phase region" \n')
+        for ii in range(len(self.x[:,0])):
+            for jj in range(len(self.x[0,:])):
+                if np.isnan(z[ii, jj]) == False:
+                    dat_file.write(" %10.4f %10.4f %10.4f \n" % (self.x[ii,jj]/self.xc, self.y[ii,jj]/self.yc, z[ii, jj]))
+
+        dat_file.write(' ZONE T = "Saturation curve" \n ')
+        for ii in range(len(self.x_sat)):
+            dat_file.write(" %10.4f %10.4f %10.4f \n" % (self.x_sat[ii]/self.xc, self.y_sat[ii]/self.yc, 1))
+
+        dat_file.write(' ZONE T = "Critical isobar" \n')
+        for ii in range(len(self.xc_iso)):
+            dat_file.write(" %10.4f %10.4f %10.4f \n" % (self.xc_iso[ii]/self.xc, self.yc_iso[ii]/self.yc, 1))
+
+        dat_file.write(' ZONE T = "Widom line" \n')
+        for ii in range(len(self.x_Widom)):
+            dat_file.write(" %10.4f %10.4f %10.4f \n" % (self.x_Widom[ii]/self.xc, self.y_Widom[ii]/self.yc, 1))
+
+        dat_file.close()
 
         return

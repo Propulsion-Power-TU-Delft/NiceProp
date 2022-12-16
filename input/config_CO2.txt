@@ -8,21 +8,21 @@ PT
 
 ***************************** ISENTROPIC TRANSFORMATION *****************************
 Thermodynamic process(es): 'compression' or 'expansion' or 'None'
-compression
+None
 Do you want to design nozzle/diffuser for expansion/compression process? Y/N
-Y
+N
 Total-to-static volumetric flow ratio (it must be 0 if using pressure ratio)
 0.0
 Total-to-static pressure ratio (it must be 0 if using volumetric flow ratio)
-4.0
+2.0
 Inlet state definition: 'Ts' or 'PT' (independent from the choice of Thermodynamic plane)
-Ts     Ts
+PT
 Inlet state definition: first input
-1.01   1.05
+0.1935
 Inlet state definition: second input
-1.7    1.1
+0.885
 Label(s) associated to the thermodynamic process(es)
-iCO$_2$   niCO$_2$
+Exp
 Nozzle geometry is provided as input? Y/N (file nozzleCoordinates.txt should be located in the input folder)
 N
 
@@ -38,8 +38,8 @@ radial
 Number of grid points on x and y axes for Ts/PT contour plots
 1000
 Boundaries of contour plots along reduced T axis
-0.6   2.0
+0.75   1.5
 Boundaries of contour plots along reduced s axis (only used if Thermodynamic plane = 'Ts')
-0.75   2.0
+0.8   2.0
 Boundaries of contour plots along reduced P axis (only used if Thermodynamic plane = 'PT')
-0.5   5.5
+0.5   2.5
